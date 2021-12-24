@@ -11,17 +11,16 @@ const Canvas = () => {
     const [canvasWidgets, setCanvasWidgets] = useState([]) 
 
     useEffect( () => { 
-        const canv = new fabric.Canvas('canvas') 
+        const canv = new fabric.Canvas('canvas', {preserveObjectStacking: true})  
         setCanvas(canv)
     },[])
-
-    const backGroundBox = () =>{
+    const backGroundBox = (fill="white") =>{
         const rect = new fabric.Rect({
             top: 0, 
             left: 0,
             width: canvas.width,
             height: canvas.height, 
-            fill: 'white', 
+            fill,  
             selectable: false  
         })
         canvas.add(rect)
@@ -76,6 +75,14 @@ const Canvas = () => {
         });
         saveAs(dataURL, 'myimage.jpeg') 
     }
+    const sendObjToBack = (object) =>{
+        canvas.sendToBack(object) 
+        canvas.renderAll() 
+    }
+    const bringObjToFront = (object) =>{
+        canvas.bringToFront(object)  
+        canvas.renderAll() 
+    }
     return (
         <div className="App">
             {/* putting this in a table so i dont need to style anything right now lol */} 
@@ -86,7 +93,7 @@ const Canvas = () => {
                             <canvas id="canvas" height="600" width="500" ref={htmlCanvas}></canvas> 
                         </td>
                         <td>
-                            <WidgetEditor canvasWidgets={canvasWidgets}/>   
+                            <WidgetEditor canvasWidgets={canvasWidgets} bringToFront={bringObjToFront} sendToBack={sendObjToBack}/>   
                         </td>
                     </tr>
                 </tbody>  
@@ -95,8 +102,9 @@ const Canvas = () => {
                 makeTextBox={makeTextBox} 
                 uploadImage={uploadImage} 
                 saveAsImage={saveAsImage} 
-            />  
-            <button onClick={()=>console.log(canvasWidgets)}>Log Widgets</button>     
+            /> 
+            {/* tester buttons */}
+            <button onClick={()=>console.log(canvasWidgets)}>Log Widgets</button> 
         </div>
     );
 }

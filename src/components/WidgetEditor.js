@@ -1,4 +1,4 @@
-const WidgetEditor = ({canvasWidgets}) =>{
+const WidgetEditor = ({canvasWidgets, sendToBack, bringToFront}) =>{
     
     const getImage = (widget) =>{
         try{
@@ -22,6 +22,8 @@ const WidgetEditor = ({canvasWidgets}) =>{
         }
         return getImage(widget) 
     }
+    const handleBringToFront = (widget) =>{bringToFront(widget)}
+    const handleSendToBack = (widget) => {sendToBack(widget)}  
 
     if(canvasWidgets){ 
         return(
@@ -29,7 +31,11 @@ const WidgetEditor = ({canvasWidgets}) =>{
                 { 
                     canvasWidgets.map( (widget,idx) => { 
                         if (getElem(widget)){
-                            return <li key={idx}>{getElem(widget)} </li> 
+                            return <li key={idx}>
+                                        {getElem(widget)}
+                                        <button onClick={() => handleSendToBack(widget)}>Send to Back</button>
+                                        <button onClick={() => handleBringToFront(widget)}>Bring to front</button>
+                                   </li> 
                         } else{
                             // an error was thrown and we don't render anything. 
                             return null 
