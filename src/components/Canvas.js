@@ -27,9 +27,15 @@ const Canvas = () => {
         canvas.add(rect)
         canvas.sendToBack(rect) 
     }
+    const addObjectToCanv = (object) =>{
+        canvas.add(object) 
+        canvas.setActiveObject(object)  
+        canvas.renderAll()
+        setCanvasWidgets(canvas.getObjects())
+    }
+    // *Check if you can later change this so that it uses canvasWidgets rather than canvas.getObjects() calls 
     const updateWidgetsOnTextChange = (textBox) =>{
-        const idx = canvas.getObjects().indexOf(textBox);
-        console.log(idx) 
+        const idx = canvas.getObjects().indexOf(textBox); 
         if (idx >= 0){ 
             setCanvasWidgets([...canvas.getObjects().slice(0, idx), textBox, ...canvas.getObjects().slice(idx+1)])  
         }
@@ -40,10 +46,7 @@ const Canvas = () => {
     const newBox = (text) =>{ 
         const textBox = new fabric.Textbox(text, {top: 50, left: 100, width: 300});
         addTextChangeListener(textBox) 
-        canvas.add(textBox) 
-        canvas.setActiveObject(textBox) 
-        canvas.renderAll()
-        setCanvasWidgets(canvas.getObjects()) 
+        addObjectToCanv(textBox)   
     } 
     const makeTextBox = () =>{
         newBox('Click to edit text')   
@@ -55,12 +58,11 @@ const Canvas = () => {
             fabric.Image.fromURL(imageURL, function(image) {
                 const scaleX = 300/image.width; 
                 const scaleY = 400/image.height; 
-            image.set({ 
-                scaleX, 
-                scaleY 
-            }) 
-            canvas.add(image);
-            setCanvasWidgets(canvas.getObjects()) 
+                image.set({ 
+                    scaleX, 
+                    scaleY 
+                }) 
+                addObjectToCanv(image) 
             }, {crossOrigin: "Anonymous" });
         }catch(e){
             console.log("Couldnt upload your image") 
@@ -81,7 +83,7 @@ const Canvas = () => {
                 <tbody>
                     <tr>
                         <td>
-                            <canvas id="canvas" height="600" width="500" ref={htmlCanvas}></canvas>
+                            <canvas id="canvas" height="600" width="500" ref={htmlCanvas}></canvas> 
                         </td>
                         <td>
                             <WidgetEditor canvasWidgets={canvasWidgets}/>   
