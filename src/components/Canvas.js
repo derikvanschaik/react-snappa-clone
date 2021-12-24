@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import {useState, useEffect, useRef}  from 'react' 
+import {useState, useEffect, useRef}  from 'react'; 
 import { saveAs } from 'file-saver';  
 import CanvasMenu from "./CanvasMenu";
 import WidgetEditor from "./WidgetEditor"; 
@@ -13,6 +13,7 @@ const Canvas = () => {
     useEffect( () => { 
         const canv = new fabric.Canvas('canvas', {preserveObjectStacking: true})  
         setCanvas(canv)
+        window.addEventListener("keydown", (event) =>{keyPressedListener(canv, event.key)})  
     },[])
     const backGroundBox = (fill="white") =>{
         const rect = new fabric.Rect({
@@ -82,6 +83,17 @@ const Canvas = () => {
     const bringObjToFront = (object) =>{
         canvas.bringToFront(object)  
         canvas.renderAll() 
+    }
+    const keyPressedListener = (canv, keyPressed) =>{
+        if (keyPressed=="Delete"){deleteActiveObject(canv)} 
+    }
+    // canv is passed as a param because canvas is undefined when this is mounted in the useEffect...
+    const deleteActiveObject = (canv) =>{
+        const selected = canv.getActiveObject()
+        if(selected){
+            canv.remove(selected)
+            setCanvasWidgets(canv.getObjects())  
+        }
     }
     return (
         <div className="App">
