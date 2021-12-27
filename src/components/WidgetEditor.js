@@ -1,10 +1,16 @@
-const WidgetEditor = ({canvasWidgets, sendToBack, bringToFront}) =>{
+const WidgetEditor = ({canvasWidgets, sendToBack, bringToFront, changeColor}) =>{
     
+    const handleChangeColor = (widget, newColor) =>{
+        changeColor(widget, newColor)  
+    }
     const getImage = (widget) =>{
         try{
             const customStyle = {"width":"50px","height":"75px","objectFit":"cover"}
             return (
-                <img src={widget._element.currentSrc} width="100" height="200" style={customStyle}/> 
+                    <img 
+                        src={widget._element.currentSrc} 
+                        width="100" height="200" 
+                        style={customStyle}/>
             )
         }catch(e){
             console.log("an error occured in getImage", e) 
@@ -13,7 +19,11 @@ const WidgetEditor = ({canvasWidgets, sendToBack, bringToFront}) =>{
     }
     const getText = (widget) =>{
         return (
-            <p>{widget.text}</p>   
+            <div>
+                <p>{widget.text}</p>
+                <label>font color:</label>
+                <input type="color" onChange={e => changeColor(widget, e.target.value)}/>  
+            </div>  
         )
     }
     const getElem = (widget) =>{
@@ -22,12 +32,13 @@ const WidgetEditor = ({canvasWidgets, sendToBack, bringToFront}) =>{
         }
         return getImage(widget) 
     }
+    // calls parent functions 
     const handleBringToFront = (widget) =>{bringToFront(widget)}
     const handleSendToBack = (widget) => {sendToBack(widget)}  
 
     if(canvasWidgets){ 
         return(
-            <ul>
+            <ul className="widget-editor"> 
                 { 
                     canvasWidgets.map( (widget,idx) => { 
                         if (getElem(widget)){

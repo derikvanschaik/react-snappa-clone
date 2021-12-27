@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import {useState, useEffect, useRef}  from 'react'; 
+import {useState, useEffect, useRef}  from 'react';  
 import { saveAs } from 'file-saver';  
 import CanvasMenu from "./CanvasMenu";
 import WidgetEditor from "./WidgetEditor"; 
@@ -15,7 +15,7 @@ const Canvas = () => {
         setCanvas(canv)
         window.addEventListener("keydown", (event) =>{keyPressedListener(canv, event.key)})  
     },[])
-    const backGroundBox = (fill="white") =>{
+    const addBackGroundBox = (fill="white") =>{
         const rect = new fabric.Rect({
             top: 0, 
             left: 0,
@@ -25,7 +25,8 @@ const Canvas = () => {
             selectable: false  
         })
         canvas.add(rect)
-        canvas.sendToBack(rect) 
+        canvas.sendToBack(rect)
+        return rect;  
     }
     const addObjectToCanv = (object) =>{
         canvas.add(object) 
@@ -69,12 +70,18 @@ const Canvas = () => {
         }
     }
     const saveAsImage = () =>{
-        backGroundBox() 
+        // add background box 
+        const background = addBackGroundBox() 
         canvas.renderAll() 
         const dataURL = canvas.toDataURL({
             format: 'png' 
         });
-        saveAs(dataURL, 'myimage.jpeg') 
+        saveAs(dataURL, 'myimage.jpeg')
+        canvas.remove(background) // we want to remove white background after saving 
+    }
+    const changeColor = (textObject, color) =>{
+        textObject.set({fill: color});  
+        canvas.renderAll(); 
     }
     const sendObjToBack = (object) =>{
         canvas.sendToBack(object) 
@@ -85,7 +92,7 @@ const Canvas = () => {
         canvas.renderAll() 
     }
     const keyPressedListener = (canv, keyPressed) =>{
-        if (keyPressed=="Delete"){deleteActiveObject(canv)} 
+        if (keyPressed==="Delete"){deleteActiveObject(canv)} 
     }
     // canv is passed as a param because canvas is undefined when this is mounted in the useEffect...
     const deleteActiveObject = (canv) =>{
@@ -97,19 +104,16 @@ const Canvas = () => {
     }
     return (
         <div className="App">
-            {/* putting this in a table so i dont need to style anything right now lol */} 
-            <table>
-                <tbody>
-                    <tr>
-                        <td>
-                            <canvas id="canvas" height="600" width="500" ref={htmlCanvas}></canvas> 
-                        </td>
-                        <td>
-                            <WidgetEditor canvasWidgets={canvasWidgets} bringToFront={bringObjToFront} sendToBack={sendObjToBack}/>   
-                        </td>
-                    </tr>
-                </tbody>  
-            </table>
+            <div className="canvas-widgets-container clearfix"> 
+                <canvas id="canvas" height="600" width="500" ref={htmlCanvas}>
+                </canvas> 
+                <WidgetEditor className="widget-editor" 
+                    canvasWidgets={canvasWidgets} 
+                    bringToFront={bringObjToFront} 
+                    sendToBack={sendObjToBack}
+                    changeColor={changeColor}  
+                />
+            </div> 
             <CanvasMenu  
                 makeTextBox={makeTextBox} 
                 uploadImage={uploadImage} 
